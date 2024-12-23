@@ -2,16 +2,16 @@ import express from 'express';
 import mongoose from 'mongoose';
 import User from './models/User.js'
 import bcrypt from 'bcrypt';
-import 'dotenv/config';
+import 'dotenv/config'
 
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.port ?? 3000;
-const uri  = process.env.URL_BD;
+const PORT = 3000;
+const uri  = process.env.URL_DB;
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 
-async function run() {  
+async function run() {
   try {
     // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
     await mongoose.connect(uri, clientOptions);
@@ -20,7 +20,8 @@ async function run() {
   } catch {
     // Ensures that the client will close when you finish/error
     await mongoose.disconnect();
-    console.log("You successfully disconnected to MongoDB!");
+    console.log("YOU HAVE BEEN DISCONNECTED, YOU FOOL!");
+
   }
 }
 run().catch(console.dir);
@@ -31,7 +32,9 @@ app.get('/', (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   try {
   const { username, password } = req.body;
 
@@ -50,6 +53,9 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/register', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'POST');
   console.log(req.body);
 
   try {
@@ -73,6 +79,20 @@ app.post('/register', async (req, res) => {
   } catch (error) {
     res.status(400).send( {error: error.message} )
   }
+})
+
+app.options("/register", (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.status(200).sendStatus(200);
+})
+
+app.options("/login", (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.status(200).sendStatus(200);
 })
 
 app.post('/logout', (req, res) => {})

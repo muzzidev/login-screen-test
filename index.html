@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #5b5b5b;
+        }
+        .container {
+            display: flex;
+            gap: 2rem;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-box {
+            width: 300px;
+        }
+        .form-box h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .form-box form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-box label {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .form-box input {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-box button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-box button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #d9534f;
+        }
+        .message.success {
+            color: #5cb85c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-box">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <label for="login-username">Nombre de Usuario</label>
+                <input type="text" id="login-username" name="username" placeholder="Ingresa tu usuario" required>
+
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" name="password" placeholder="Ingresa tu contraseña" required>
+
+                <button type="submit">Iniciar Sesión</button>
+                <div id="login-message" class="message"></div>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-box">
+            <h2>Registrarse</h2>
+            <form id="register-form">
+                <label for="register-username">Nombre de Usuario</label>
+                <input type="text" id="register-username" name="username" placeholder="Ingresa tu usuario" required>
+
+                <label for="register-password">Contraseña</label>
+                <input type="password" id="register-password" name="password" placeholder="Ingresa tu contraseña" required>
+
+                <button type="submit">Registrarse</button>
+                <div id="register-message" class="message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const messageBox = document.getElementById('login-message');
+
+            try {
+                const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (response.ok) {
+                    messageBox.textContent = 'Inicio de sesión correcto';
+                    messageBox.className = 'message success';
+                } else {
+                    messageBox.textContent = 'Error al iniciar sesión';
+                    messageBox.className = 'message';
+                }
+            } catch (error) {
+                messageBox.textContent = 'Error de conexión con la API';
+                messageBox.className = 'message';
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const messageBox = document.getElementById('register-message');
+
+            try {
+                const response = await fetch('http://localhost:3000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (response.ok) {
+                    messageBox.textContent = 'Registro exitoso';
+                    messageBox.className = 'message success';
+                } else {
+                    messageBox.textContent = 'Error al registrarse';
+                    messageBox.className = 'message';
+                }
+            } catch (error) {
+                messageBox.textContent = 'Error de conexión con la API';
+                messageBox.className = 'message';
+                console.log(error);
+                
+            }
+        });
+    </script>
+</body>
+</html>
