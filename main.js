@@ -1,11 +1,12 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import User from './models/User.js'
-import bcrypt from 'bcrypt';
-import 'dotenv/config'
+import 'dotenv/config';
+import { defaultHeaders } from './config.js';
+import userRouter from './routers/userRouter.js';
 
 const app = express();
 app.use(express.json());
+app.use(defaultHeaders());
 
 const PORT = 3000;
 const uri  = process.env.URL_DB;
@@ -26,76 +27,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', (req, res) => {
-  User.find()
-    .then(Users => res.status(200).json(Users)); // responde 200 OK
-})
-
-app.post('/login', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  try {
-  const { username, password } = req.body;
-
-  const user = await User.findOne({ username });
-  if (!user) throw new Error('username doesnt exist');
-
-  const isValid = bcrypt.compareSync(password, user.password);
-  if (!isValid) throw new Error('password is invalid');
-
-  res.status(200);
-  res.send({id: user.id, username: user.username}); 
-  } catch(error) {
-    res.status(400).send( error.message )
-  }
-
-})
-
-app.post('/register', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'POST');
-  console.log(req.body);
-
-  try {
-    const { username, password } = req.body;
-
-    if (typeof username !== 'string') throw new Error('username must be a string');
-    if (username.length < 3) throw new Error('username must be at least 3 characters long');
-
-    if (typeof password !== 'string') throw new Error('password must be a string');
-    if (password.length < 6) throw new Error('password must be at least 6 characters long');
-
-    const userExists = await User.findOne({ username });
-    if (userExists) throw new Error('username already exists');
-
-    const hashedPassword = await bcrypt.hashSync(password, 10);
-
-    const newUser = new User({username, password: hashedPassword});
-
-    await newUser.save()
-    res.status(200).json({ msg: 'User created' });
-  } catch (error) {
-    res.status(400).send( {error: error.message} )
-  }
-})
-
-app.options("/register", (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.status(200).sendStatus(200);
-})
-
-app.options("/login", (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.status(200).sendStatus(200);
-})
-
-app.post('/logout', (req, res) => {})
+app.use('/user', userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running in port ${PORT}`);

@@ -111,7 +111,7 @@
             const messageBox = document.getElementById('login-message');
 
             try {
-                const response = await fetch('http://localhost:3000/login', {
+                const response = await fetch('http://localhost:3000/user/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -140,7 +140,7 @@
             const messageBox = document.getElementById('register-message');
 
             try {
-                const response = await fetch('http://localhost:3000/register', {
+                const response = await fetch('http://localhost:3000/user/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -152,7 +152,7 @@
                     messageBox.textContent = 'Registro exitoso';
                     messageBox.className = 'message success';
                 } else {
-                    messageBox.textContent = 'Error al registrarse';
+                    messageBox.textContent = 'Error al registrar';
                     messageBox.className = 'message';
                 }
             } catch (error) {
